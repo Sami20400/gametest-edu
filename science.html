@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مستكشف الفضاء الصغير – العلوم</title>
+  <!-- رابط Tailwind (للتصميم) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #0a0a2a;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background-color: white;
+      border-radius: 50%;
+      animation: twinkle 5s infinite;
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.2; }
+      50% { opacity: 1; }
+      100% { opacity: 0.2; }
+    }
+
+    .planet-animation {
+      animation: float 6s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+      100% { transform: translateY(0px) rotate(0deg); }
+    }
+
+    .glow {
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7));
+    }
+
+    .crystal {
+      animation: crystal-glow 2s infinite alternate;
+    }
+
+    @keyframes crystal-glow {
+      0% { filter: drop-shadow(0 0 5px rgba(100, 220, 255, 0.7)); }
+      100% { filter: drop-shadow(0 0 15px rgba(100, 220, 255, 1)); }
+    }
+
+    .firework {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      animation: explode 1s forwards;
+    }
+
+    @keyframes explode {
+      0% { transform: scale(0); opacity: 1; }
+      100% { transform: scale(20); opacity: 0; }
+    }
+
+    .badge {
+      transition: all 0.3s;
+    }
+
+    .badge:hover {
+      transform: scale(1.1);
+      filter: brightness(1.2);
+    }
+
+    .option:hover {
+      transform: scale(1.03);
+      filter: brightness(1.1);
+    }
+
+    .btn-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .planet-card {
+      transition: all 0.3s ease;
+    }
+
+    .planet-card:hover {
+      transform: translateY(-10px);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- خلفية النجوم -->
+  <div id="stars" class="stars"></div>
+
+  <!-- القائمة الرئيسية -->
+  <div id="main-menu" class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div class="text-center">
+      <h1 class="text-5xl md:text-7xl font-bold mb-6 text-blue-300 glow">مستكشف الفضاء الصغير</h1>
+      <p class="text-xl md:text-2xl mb-10 text-blue-100">انطلق في رحلة لاستكشاف كواكب المجموعة الشمسية وجمع بلورات المعرفة!</p>
+
+      <div class="relative w-64 h-64 mx-auto my-8">
+        <svg class="planet-animation" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="80" fill="#3498db" />
+          <circle cx="50" cy="70" r="15" fill="#2980b9" />
+          <circle cx="130" cy="50" r="20" fill="#2980b9" />
+          <circle cx="150" cy="120" r="10" fill="#2980b9" />
+          <circle cx="80" cy="150" r="25" fill="#2980b9" />
+          <ellipse cx="100" cy="100" rx="95" ry="30" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+        </svg>
+        <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center">
+          <div class="crystal w-16 h-16">
+            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="25,0 50,25 25,50 0,25" fill="rgba(100, 220, 255, 0.7)" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <button id="start-btn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xl font-bold py-4 px-10 rounded-full transition-all duration-300 btn-hover">
+          ابدأ المهمة
+        </button>
+      </div>
+
+      <div class="mt-8">
+        <input type="text" id="player-name" placeholder="أدخل اسمك" class="bg-blue-900 bg-opacity-50 text-white border border-blue-400 rounded-lg py-2 px-4 text-center w-64">
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة اختيار الكواكب -->
+  <div id="planet-selection" class="min-h-screen py-10 px-4 hidden">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <h2 class="text-3xl font-bold text-blue-300">اختر كوكباً للاستكشاف</h2>
+        <div class="flex items-center gap-4">
+          <div class="bg-blue-900 bg-opacity-50 rounded-lg py-2 px-4">
+            <span id="player-display" class="text-lg">المستكشف: </span>
+          </div>
+          <div class="bg-blue-900 bg-opacity-50 rounded-lg py-2 px-4">
+            <span class="text-lg">النقاط: <span id="score-display">0</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-8">
+        <div class="w-full bg-blue-900 bg-opacity-30 rounded-full h-4">
+          <div id="progress-bar" class="bg-gradient-to-r from-blue-400 to-purple-500 h-4 rounded-full" style="width: 0%"></div>
+        </div>
+        <div class="text-center mt-2 text-blue-200">
+          <span id="progress-text">0/8 كواكب مكتشفة</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- بطاقات الكواكب ستضاف هنا بواسطة JavaScript -->
+      </div>
+
+      <div class="mt-10">
+        <h3 class="text-2xl font-bold text-blue-300 mb-4">شاراتك</h3>
+        <div id="badges-container" class="flex flex-wrap gap-4">
+          <!-- الشارات ستضاف هنا بواسطة JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة الكوكب والأسئلة -->
+  <div id="planet-screen" class="min-h-screen py-10 px-4 hidden">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex justify-between items-center mb-8">
+        <button id="back-to-selection" class="bg-blue-800 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-all duration-300">
+          العودة للقائمة
+        </button>
+        <div class="flex items-center gap-4">
+          <div class="bg-blue-900 bg-opacity-50 rounded-lg py-2 px-4">
+            <span id="planet-score-display" class="text-lg">النقاط: 0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-blue-900 bg-opacity-20 rounded-2xl p-6 flex flex-col items-center">
+          <h2 id="planet-name" class="text-3xl font-bold text-center mb-6 text-blue-300"></h2>
+          <div id="planet-image" class="w-64 h-64 planet-animation mb-6"></div>
+          <div id="planet-facts" class="w-full space-y-4">
+            <!-- الحقائق ستضاف هنا بواسطة JavaScript -->
+          </div>
+        </div>
+
+        <div class="bg-blue-900 bg-opacity-20 rounded-2xl p-6">
+          <h3 class="text-2xl font-bold mb-6 text-center text-blue-300">اختبر معلوماتك!</h3>
+          <div id="quiz-container" class="space-y-8">
+            <!-- الأسئلة ستضاف هنا بواسطة JavaScript -->
+          </div>
+          <div class="mt-8 text-center">
+            <button id="submit-answers" class="bg-gradient-to-r from-green-500 to-blue-500 text-white text-lg font-bold py-3 px-8 rounded-lg transition-all duration-300 btn-hover">
+              تحقق من إجاباتك
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- شاشة النتيجة النهائية -->
+  <div id="final-screen" class="min-h-screen flex flex-col items-center justify-center p-4 hidden">
+    <div class="bg-blue-900 bg-opacity-30 rounded-2xl p-8 max-w-2xl w-full text-center">
+      <h2 class="text-4xl font-bold mb-6 text-blue-300">مبروك!</h2>
+      <p class="text-xl mb-4">لقد أكملت رحلتك عبر المجموعة الشمسية</p>
+
+      <div class="my-8 border-4 border-blue-400 rounded-lg p-6 bg-gradient-to-b from-blue-900 to-purple-900">
+        <h3 class="text-2xl font-bold mb-2 text-yellow-300">شهادة</h3>
+        <h4 class="text-3xl font-bold mb-4 text-blue-200">مستكشف الكواكب الصغير</h4>
+        <p class="text-xl mb-2">تمنح إلى</p>
+        <p id="certificate-name" class="text-2xl font-bold mb-4 text-white"></p>
+        <p class="text-lg">لإكمال استكشاف المجموعة الشمسية بنجاح</p>
+        <p class="text-lg mt-2">النقاط النهائية: <span id="final-score" class="font-bold"></span></p>
+      </div>
+
+      <button id="play-again" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white text-xl font-bold py-3 px-8 rounded-full transition-all duration-300 btn-hover mt-4">
+        العب مرة أخرى
+      </button>
+    </div>
+  </div>
+
+  <!-- نافذة منبثقة للإجابة الصحيحة -->
+  <div id="correct-popup" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 z-50 hidden">
+    <div class="bg-gradient-to-r from-green-600 to-blue-600 rounded-xl p-6 text-center max-w-md">
+      <h3 class="text-2xl font-bold mb-4 text-white">إجابة صحيحة!</h3>
+      <div class="w-24 h-24 mx-auto my-4 crystal">
+        <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="25,0 50,25 25,50 0,25" fill="rgba(100, 220, 255, 0.7)" />
+        </svg>
+      </div>
+      <p class="text-xl mb-4 text-white">لقد حصلت على بلورة معرفة!</p>
+      <button id="continue-btn" class="bg-white text-blue-800 text-lg font-bold py-2 px-6 rounded-lg transition-all duration-300 btn-hover">
+        استمر
+      </button>
+    </div>
+  </div>
+
+  <!-- نافذة منبثقة للشارة الجديدة -->
+  <div id="badge-popup" class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-70 z-50 hidden">
+    <div class="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-6 text-center max-w-md">
+      <h3 class="text-2xl font-bold mb-4 text-white">شارة جديدة!</h3>
+      <div id="badge-image" class="w-32 h-32 mx-auto my-4"></div>
+      <p id="badge-name" class="text-xl mb-4 text-white"></p>
+      <button id="badge-continue-btn" class="bg-white text-blue-800 text-lg font-bold py-2 px-6 rounded-lg transition-all duration-300 btn-hover">
+        رائع!
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // بيانات الكواكب
+    const planets = [
+      {
+        id: 'mercury',
+        name: 'عطارد',
+        color: '#A9A9A9',
+        facts: [
+          'أقرب كوكب إلى الشمس',
+          'يوم واحد على عطارد يعادل 59 يوماً أرضياً',
+          'درجة الحرارة تتراوح بين -173°م و427°م',
+          'ليس له أقمار طبيعية'
+        ],
+        questions: [
+          {
+            question: 'ما هو ترتيب كوكب عطارد من الشمس؟',
+            options: ['الأول', 'الثاني', 'الثالث', 'الرابع'],
+            answer: 0
+          },
+          {
+            question: 'كم عدد الأقمار التي تدور حول عطارد؟',
+            options: ['قمر واحد', 'قمران', 'ثلاثة أقمار', 'لا يوجد أقمار'],
+            answer: 3
+          },
+          {
+            question: 'ما هي أعلى درجة حرارة على سطح عطارد؟',
+            options: ['200°م', '300°م', '427°م', '500°م'],
+            answer: 2
+          }
+        ],
+        badge: 'خبير عطارد'
+      },
+      {
+        id: 'venus',
+        name: 'الزهرة',
+        color: '#E8B66B',
+        facts: [
+          'ثاني كوكب من الشمس',
+          'يدور حول نفسه بشكل معاكس لمعظم الكواكب',
+          'أكثر الكواكب حرارة بسبب الغلاف الجوي الكثيف',
+          'يُعرف باسم "توأم الأرض" بسبب تشابه الحجم'
+        ],
+        questions: [
+          {
+            question: 'لماذا يُعتبر كوكب الزهرة الأكثر حرارة؟',
+            options: ['لأنه الأقرب للشمس', 'بسبب غلافه الجوي الكثيف', 'بسبب دورانه البطيء', 'بسبب لونه'],
+            answer: 1
+          },
+          {
+            question: 'ماذا يُطلق على كوكب الزهرة أيضاً؟',
+            options: ['الكوكب الأحمر', 'توأم الأرض', 'الكوكب العملاق', 'الكوكب الماسي'],
+            answer: 1
+          }
+        ],
+        badge: 'مستكشف الزهرة'
+      },
+      {
+        id: 'earth',
+        name: 'الأرض',
+        color: '#6B93D6',
+        facts: [
+          'الكوكب الوحيد المعروف بوجود حياة عليه',
+          '71% من سطحه مغطى بالماء',
+          'له قمر طبيعي واحد',
+          'يكمل دورة كاملة حول الشمس كل 365.25 يوماً'
+        ],
+        questions: [
+          {
+            question: 'ما هي نسبة الماء على سطح الأرض؟',
+            options: ['50%', '60%', '71%', '80%'],
+            answer: 2
+          },
+          {
+            question: 'كم عدد الأقمار الطبيعية للأرض؟',
+            options: ['لا يوجد', 'قمر واحد', 'قمران', 'ثلاثة أقمار'],
+            answer: 1
+          },
+          {
+            question: 'كم تستغرق الأرض لتكمل دورة كاملة حول الشمس؟',
+            options: ['30 يوماً', '100 يوم', '365.25 يوماً', '500 يوم'],
+            answer: 2
+          }
+        ],
+        badge: 'حامي الأرض'
+      },
+      {
+        id: 'mars',
+        name: 'المريخ',
+        color: '#E27B58',
+        facts: [
+          'يُعرف باسم "الكوكب الأحمر" بسبب أكسيد الحديد على سطحه',
+          'يحتوي على أعلى جبل في المجموعة الشمسية (أوليمبوس مونس)',
+          'له قمران صغيران: فوبوس وديموس',
+          'يوم المريخ يسمى "سول" ومدته 24.6 ساعة أرضية'
+        ],
+        questions: [
+          {
+            question: 'لماذا يُسمى المريخ بالكوكب الأحمر؟',
+            options: ['بسبب حرارته العالية', 'بسبب أكسيد الحديد على سطحه', 'بسبب الغازات في غلافه الجوي', 'بسبب انعكاس ضوء الشمس عليه'],
+            answer: 1
+          },
+          {
+            question: 'ما اسم أعلى جبل في المجموعة الشمسية الموجود على المريخ؟',
+            options: ['إيفرست', 'أوليمبوس مونس', 'ماكسويل مونتس', 'مونت بلانك'],
+            answer: 1
+          },
+          {
+            question: 'كم عدد أقمار المريخ؟',
+            options: ['لا يوجد', 'قمر واحد', 'قمران', 'ثلاثة أقمار'],
+            answer: 2
+          }
+        ],
+        badge: 'خبير المريخ'
+      },
+      {
+        id: 'jupiter',
+        name: 'المشتري',
+        color: '#C88B3A',
+        facts: [
+          'أكبر كواكب المجموعة الشمسية',
+          'كوكب غازي عملاق مكون أساساً من الهيدروجين والهيليوم',
+          'يحتوي على البقعة الحمراء العظيمة، وهي عاصفة مستمرة منذ مئات السنين',
+          'له أكثر من 79 قمراً معروفاً'
+        ],
+        questions: [
+          {
+            question: 'ما هو أكبر كواكب المجموعة الشمسية؟',
+            options: ['الأرض', 'المشتري', 'زحل', 'نبتون'],
+            answer: 1
+          },
+          {
+            question: 'ماذا تُسمى العاصفة الكبيرة المستمرة على كوكب المشتري؟',
+            options: ['العين الكبرى', 'البقعة الحمراء العظيمة', 'الدوامة الغازية', 'الإعصار الدائم'],
+            answer: 1
+          },
+          {
+            question: 'مم يتكون كوكب المشتري بشكل أساسي؟',
+            options: ['صخور وحديد', 'هيدروجين وهيليوم', 'ماء وجليد', 'كربون وأكسجين'],
+            answer: 1
+          }
+        ],
+        badge: 'مستكشف المشتري'
+      },
+      {
+        id: 'saturn',
+        name: 'زحل',
+        color: '#E3CD81',
+        facts: [
+          'يتميز بحلقاته الجميلة المكونة من جليد وصخور',
+          'ثاني أكبر كواكب المجموعة الشمسية',
+          'كثافته أقل من كثافة الماء (يمكنه الطفو في حوض ماء كبير بما يكفي)',
+          'له أكثر من 80 قمراً، أكبرها تيتان'
+        ],
+        questions: [
+          {
+            question: 'مم تتكون حلقات زحل؟',
+            options: ['غازات ملونة', 'جليد وصخور', 'معادن ثمينة', 'غبار نجمي'],
+            answer: 1
+          },
+          {
+            question: 'ما هو أكبر أقمار زحل؟',
+            options: ['تيتان', 'أوروبا', 'غانيميد', 'تريتون'],
+            answer: 0
+          },
+          {
+            question: 'ما هي خاصية زحل الفريدة المتعلقة بكثافته؟',
+            options: ['أثقل من الرصاص', 'يمكنه الطفو على الماء', 'كثافته متغيرة', 'أكثر كثافة من الأرض'],
+            answer: 1
+          }
+        ],
+        badge: 'سيد حلقات زحل'
+      },
+      {
+        id: 'uranus',
+        name: 'أورانوس',
+        color: '#93C6D6',
+        facts: [
+          'يميل على جانبه بزاوية 98 درجة تقريباً',
+          'له 27 قمراً معروفاً',
+          'يتميز بلونه الأزرق المخضر بسبب غاز الميثان',
+          'يستغرق 84 سنة أرضية ليكمل دورة واحدة حول الشمس'
+        ],
+        questions: [
+          {
+            question: 'ما الذي يميز محور دوران أورانوس؟',
+            options: ['يدور بشكل عمودي', 'يميل على جانبه', 'يدور بشكل معاكس', 'لا يدور حول نفسه'],
+            answer: 1
+          },
+          {
+            question: 'ما سبب اللون الأزرق المخضر لكوكب أورانوس؟',
+            options: ['انعكاس المياه', 'غاز الميثان', 'غاز الأكسجين', 'غبار فضائي'],
+            answer: 1
+          },
+          {
+            question: 'كم سنة أرضية يستغرق أورانوس ليكمل دورة حول الشمس؟',
+            options: ['30 سنة', '50 سنة', '84 سنة', '100 سنة'],
+            answer: 2
+          }
+        ],
+        badge: 'مكتشف أورانوس'
+      },
+      {
+        id: 'neptune',
+        name: 'نبتون',
+        color: '#3E66A3',
+        facts: [
+          'أبعد كوكب في المجموعة الشمسية',
+          'يحتوي على أقوى رياح في المجموعة الشمسية تصل سرعتها إلى 2100 كم/ساعة',
+          'اكتُشف عام 1846 بناءً على حسابات رياضية',
+          'له 14 قمراً معروفاً، أكبرها تريتون'
+        ],
+        questions: [
+          {
+            question: 'ما هو ترتيب كوكب نبتون من الشمس؟',
+            options: ['السادس', 'السابع', 'الثامن', 'التاسع'],
+            answer: 2
+          },
+          {
+            question: 'بماذا يتميز الطقس على كوكب نبتون؟',
+            options: ['هادئ جداً', 'أقوى رياح في المجموعة الشمسية', 'أمطار من الماس', 'عواصف رملية'],
+            answer: 1
+          },
+          {
+            question: 'كيف تم اكتشاف كوكب نبتون؟',
+            options: ['بالصدفة', 'بناءً على حسابات رياضية', 'من خلال المراقبة المباشرة', 'من خلال إشارات راديوية'],
+            answer: 1
+          }
+        ],
+        badge: 'سيد نبتون'
+      }
+    ];
+
+    // متغيرات عامة
+    let playerName = '';
+    let totalScore = 0;
+    let discoveredPlanets = 0;
+    let earnedBadges = [];
+    let currentPlanet = null;
+    let currentAnswers = [];
+
+    // إنشاء النجوم في الخلفية
+    function createStars() {
+      const starsContainer = document.getElementById('stars');
+      const starsCount = 200;
+
+      for (let i = 0; i < starsCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+
+        const size = Math.random() * 3;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+
+        const left = Math.random() * 100;
+        const top = Math.random() * 100;
+        star.style.left = `${left}%`;
+        star.style.top = `${top}%`;
+
+        star.style.animationDelay = `${Math.random() * 5}s`;
+
+        starsContainer.appendChild(star);
+      }
+    }
+
+    // إنشاء بطاقات الكواكب
+    function createPlanetCards() {
+      const container = document.querySelector('#planet-selection .grid');
+      container.innerHTML = '';
+
+      planets.forEach(planet => {
+        const card = document.createElement('div');
+        card.classList.add('planet-card', 'bg-blue-900', 'bg-opacity-20', 'rounded-xl', 'p-4', 'text-center', 'cursor-pointer');
+        card.dataset.planetId = planet.id;
+
+        const isDiscovered = earnedBadges.some(badge => badge.planetId === planet.id);
+
+        card.innerHTML = `
+          <div class="relative">
+            <svg class="w-32 h-32 mx-auto planet-animation" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="100" r="80" fill="${planet.color}" />
+              ${getPlanetDetails(planet.id)}
+            </svg>
+            ${isDiscovered ? `
+              <div class="absolute top-0 right-0 bg-green-500 rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            ` : ''}
+          </div>
+          <h3 class="text-xl font-bold mt-4 text-blue-300">${planet.name}</h3>
+        `;
+
+        card.addEventListener('click', () => selectPlanet(planet.id));
+        container.appendChild(card);
+      });
+    }
+
+    // الحصول على تفاصيل رسم الكوكب
+    function getPlanetDetails(planetId) {
+      switch(planetId) {
+        case 'mercury':
+          return `
+            <circle cx="70" cy="80" r="10" fill="#8A8A8A" />
+            <circle cx="120" cy="70" r="15" fill="#8A8A8A" />
+          `;
+        case 'venus':
+          return `
+            <circle cx="70" cy="80" r="15" fill="#D6A55C" />
+            <circle cx="130" cy="90" r="20" fill="#D6A55C" />
+            <circle cx="90" cy="130" r="12" fill="#D6A55C" />
+          `;
+        case 'earth':
+          return `
+            <path d="M60,80 Q100,40 140,80 Q100,120 60,80" fill="#2E7D32" />
+            <path d="M60,120 Q100,80 140,120 Q100,160 60,120" fill="#2E7D32" />
+            <circle cx="150" cy="70" r="10" fill="#CCCCCC" />
+          `;
+        case 'mars':
+          return `
+            <circle cx="70" cy="70" r="15" fill="#C25B41" />
+            <circle cx="130" cy="80" r="20" fill="#C25B41" />
+            <circle cx="60" cy="40" r="5" fill="#DDDDDD" />
+            <circle cx="140" cy="40" r="3" fill="#DDDDDD" />
+          `;
+        case 'jupiter':
+          return `
+            <ellipse cx="100" cy="70" rx="70" ry="10" fill="#A67B30" />
+            <ellipse cx="100" cy="90" rx="70" ry="10" fill="#8B5E26" />
+            <ellipse cx="100" cy="110" rx="70" ry="10" fill="#A67B30" />
+            <circle cx="130" cy="80" r="15" fill="#8B5E26" />
+          `;
+        case 'saturn':
+          return `
+            <ellipse cx="100" cy="100" rx="95" ry="20" fill="transparent" stroke="#D6BC74" stroke-width="10" />
+            <circle cx="70" cy="80" r="10" fill="#D6BC74" />
+            <circle cx="130" cy="90" r="15" fill="#D6BC74" />
+          `;
+        case 'uranus':
+          return `
+            <ellipse cx="100" cy="100" rx="85" ry="15" fill="transparent" stroke="#7EB6C6" stroke-width="5" />
+            <circle cx="70" cy="80" r="10" fill="#7EB6C6" />
+            <circle cx="130" cy="90" r="15" fill="#7EB6C6" />
+          `;
+        case 'neptune':
+          return `
+            <circle cx="70" cy="80" r="15" fill="#2E56A3" />
+            <circle cx="130" cy="90" r="20" fill="#2E56A3" />
+            <path d="M50,100 Q100,120 150,100" fill="none" stroke="#1E3E8A" stroke-width="5" />
+          `;
+        default:
+          return '';
+      }
+    }
+
+    // إنشاء شارات
+    function createBadges() {
+      const container = document.getElementById('badges-container');
+      container.innerHTML = '';
+
+      if (earnedBadges.length === 0) {
+        container.innerHTML = '<p class="text-blue-200">لم تحصل على أي شارات بعد. استكشف الكواكب للحصول على شارات!</p>';
+        return;
+      }
+
+      earnedBadges.forEach(badge => {
+        const badgeEl = document.createElement('div');
+        badgeEl.classList.add('badge', 'bg-blue-800', 'bg-opacity-50', 'rounded-lg', 'p-3', 'text-center');
+
+        const planet = planets.find(p => p.id === badge.planetId);
+
+        badgeEl.innerHTML = `
+          <svg class="w-16 h-16 mx-auto" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="45" fill="${planet.color}" />
+            <polygon points="50,5 61,40 97,40 68,62 79,97 50,75 21,97 32,62 3,40 39,40" fill="gold" fill-opacity="0.7" />
+            <circle cx="50" cy="50" r="20" fill="${planet.color}" stroke="gold" stroke-width="2" />
+          </svg>
+          <p class="text-sm mt-2 text-blue-200">${badge.name}</p>
+        `;
+
+        container.appendChild(badgeEl);
+      });
+    }
+
+    // اختيار كوكب
+    function selectPlanet(planetId) {
+      currentPlanet = planets.find(planet => planet.id === planetId);
+
+      document.getElementById('planet-name').textContent = currentPlanet.name;
+
+      const planetImage = document.getElementById('planet-image');
+      planetImage.innerHTML = `
+        <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="100" r="80" fill="${currentPlanet.color}" />
+          ${getPlanetDetails(currentPlanet.id)}
+        </svg>
+      `;
+
+      const factsContainer = document.getElementById('planet-facts');
+      factsContainer.innerHTML = '';
+      currentPlanet.facts.forEach(fact => {
+        const factEl = document.createElement('div');
+        factEl.classList.add('bg-blue-800', 'bg-opacity-40', 'rounded-lg', 'p-3');
+        factEl.innerHTML = `
+          <div class="flex items-start">
+            <span class="text-yellow-300 mr-2">★</span>
+            <p>${fact}</p>
+          </div>
+        `;
+        factsContainer.appendChild(factEl);
+      });
+
+      createQuestions();
+
+      document.getElementById('planet-selection').classList.add('hidden');
+      document.getElementById('planet-screen').classList.remove('hidden');
+    }
+
+    // إنشاء الأسئلة
+    function createQuestions() {
+      const quizContainer = document.getElementById('quiz-container');
+      quizContainer.innerHTML = '';
+      currentAnswers = [];
+
+      currentPlanet.questions.forEach((question, qIndex) => {
+        const questionEl = document.createElement('div');
+        questionEl.classList.add('question-container');
+
+        let optionsHTML = '';
+        question.options.forEach((option, oIndex) => {
+          optionsHTML += `
+            <div class="option bg-blue-800 bg-opacity-30 rounded-lg p-3 cursor-pointer transition-all duration-300" data-question="${qIndex}" data-option="${oIndex}">
+              <div class="flex items-center">
+                <div class="w-6 h-6 rounded-full border-2 border-blue-300 mr-3 flex items-center justify-center option-circle">
+                  <div class="option-inner hidden w-3 h-3 rounded-full bg-blue-300"></div>
+                </div>
+                <span>${option}</span>
+              </div>
+            </div>
+          `;
+        });
+
+        questionEl.innerHTML = `
+          <h4 class="text-xl mb-4">${qIndex + 1}. ${question.question}</h4>
+          <div class="space-y-3">
+            ${optionsHTML}
+          </div>
+        `;
+        quizContainer.appendChild(questionEl);
+        currentAnswers.push(null);
+      });
+
+      document.querySelectorAll('.option').forEach(option => {
+        option.addEventListener('click', selectOption);
+      });
+    }
+
+    // اختيار إجابة
+    function selectOption(e) {
+      const option = e.currentTarget;
+      const questionIndex = parseInt(option.dataset.question);
+      const optionIndex = parseInt(option.dataset.option);
+
+      const questionOptions = document.querySelectorAll(`.option[data-question="${questionIndex}"]`);
+      questionOptions.forEach(opt => {
+        opt.classList.remove('bg-blue-600');
+        opt.querySelector('.option-inner').classList.add('hidden');
+      });
+
+      option.classList.add('bg-blue-600');
+      option.querySelector('.option-inner').classList.remove('hidden');
+
+      currentAnswers[questionIndex] = optionIndex;
+    }
+
+    // التحقق من الإجابات
+    function checkAnswers() {
+      if (currentAnswers.includes(null)) {
+        alert('الرجاء الإجابة على جميع الأسئلة');
+        return;
+      }
+
+      let correctCount = 0;
+      currentPlanet.questions.forEach((question, index) => {
+        if (currentAnswers[index] === question.answer) {
+          correctCount++;
+        }
+      });
+
+      const pointsEarned = correctCount * 10;
+      totalScore += pointsEarned;
+
+      document.getElementById('score-display').textContent = totalScore;
+      document.getElementById('planet-score-display').textContent = `النقاط: ${totalScore}`;
+
+      showCorrectPopup(correctCount, currentPlanet.questions.length);
+
+      if (correctCount === currentPlanet.questions.length) {
+        const alreadyHasBadge = earnedBadges.some(badge => badge.planetId === currentPlanet.id);
+        if (!alreadyHasBadge) {
+          earnedBadges.push({
+            planetId: currentPlanet.id,
+            name: currentPlanet.badge
+          });
+          discoveredPlanets++;
+          updateProgressBar();
+        }
+      }
+    }
+
+    // إظهار نافذة الإجابة الصحيحة
+    function showCorrectPopup(correctCount, totalQuestions) {
+      const popup = document.getElementById('correct-popup');
+      const heading = popup.querySelector('h3');
+      const message = popup.querySelector('p');
+
+      if (correctCount === totalQuestions) {
+        heading.textContent = 'ممتاز!';
+        message.textContent = `لقد أجبت على جميع الأسئلة بشكل صحيح وحصلت على ${correctCount * 10} نقطة!`;
+        createFireworks(popup);
+      } else if (correctCount > 0) {
+        heading.textContent = 'جيد!';
+        message.textContent = `لقد أجبت على ${correctCount} من ${totalQuestions} أسئلة بشكل صحيح وحصلت على ${correctCount * 10} نقطة.`;
+      } else {
+        heading.textContent = 'حاول مرة أخرى';
+        message.textContent = 'لم تجب على أي سؤال بشكل صحيح. حاول مرة أخرى!';
+      }
+
+      popup.classList.remove('hidden');
+    }
+
+    // إنشاء الألعاب النارية
+    function createFireworks(container) {
+      for (let i = 0; i < 10; i++) {
+        setTimeout(() => {
+          const firework = document.createElement('div');
+          firework.classList.add('firework');
+
+          const colors = ['#FF5252', '#FFEB3B', '#2196F3', '#4CAF50', '#E040FB'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          firework.style.backgroundColor = randomColor;
+
+          const x = 100 + Math.random() * 300 - 150;
+          const y = 100 + Math.random() * 200 - 100;
+          firework.style.left = `${x}px`;
+          firework.style.top = `${y}px`;
+
+          container.appendChild(firework);
+
+          setTimeout(() => {
+            firework.remove();
+          }, 1000);
+        }, i * 200);
+      }
+    }
+
+    // إظهار نافذة الشارة الجديدة
+    function showBadgePopup() {
+      if (earnedBadges.length === 0) return;
+      const latestBadge = earnedBadges[earnedBadges.length - 1];
+      const planet = planets.find(p => p.id === latestBadge.planetId);
+
+      const popup = document.getElementById('badge-popup');
+      const badgeImage = document.getElementById('badge-image');
+      const badgeName = document.getElementById('badge-name');
+
+      badgeImage.innerHTML = `
+        <svg class="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="50" cy="50" r="45" fill="${planet.color}" />
+          <polygon points="50,5 61,40 97,40 68,62 79,97 50,75 21,97 32,62 3,40 39,40" fill="gold" fill-opacity="0.7" />
+          <circle cx="50" cy="50" r="20" fill="${planet.color}" stroke="gold" stroke-width="2" />
+        </svg>
+      `;
+      badgeName.textContent = latestBadge.name;
+      popup.classList.remove('hidden');
+    }
+
+    // تحديث شريط التقدم
+    function updateProgressBar() {
+      const progressBar = document.getElementById('progress-bar');
+      const progressText = document.getElementById('progress-text');
+
+      const percentage = (discoveredPlanets / planets.length) * 100;
+      progressBar.style.width = `${percentage}%`;
+      progressText.textContent = `${discoveredPlanets}/${planets.length} كواكب مكتشفة`;
+
+      if (discoveredPlanets === planets.length) {
+        setTimeout(() => {
+          showFinalScreen();
+        }, 1500);
+      }
+    }
+
+    // إظهار الشاشة النهائية
+    function showFinalScreen() {
+      document.getElementById('planet-selection').classList.add('hidden');
+      document.getElementById('planet-screen').classList.add('hidden');
+
+      document.getElementById('certificate-name').textContent = playerName;
+      document.getElementById('final-score').textContent = totalScore;
+
+      document.getElementById('final-screen').classList.remove('hidden');
+      createFinalFireworks();
+    }
+
+    // الألعاب النارية النهائية
+    function createFinalFireworks() {
+      const container = document.getElementById('final-screen');
+      for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+          const firework = document.createElement('div');
+          firework.classList.add('firework');
+
+          const colors = ['#FF5252', '#FFEB3B', '#2196F3', '#4CAF50', '#E040FB', '#FFC107', '#00BCD4'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          firework.style.backgroundColor = randomColor;
+
+          const x = Math.random() * window.innerWidth;
+          const y = Math.random() * window.innerHeight;
+          firework.style.left = `${x}px`;
+          firework.style.top = `${y}px`;
+
+          container.appendChild(firework);
+
+          setTimeout(() => {
+            firework.remove();
+          }, 1000);
+        }, i * 300);
+      }
+    }
+
+    // إعادة تعيين اللعبة
+    function resetGame() {
+      playerName = document.getElementById('player-name').value || 'مستكشف مجهول';
+      totalScore = 0;
+      discoveredPlanets = 0;
+      earnedBadges = [];
+      currentPlanet = null;
+      currentAnswers = [];
+
+      document.getElementById('player-display').textContent = `المستكشف: ${playerName}`;
+      document.getElementById('score-display').textContent = '0';
+
+      updateProgressBar();
+      createPlanetCards();
+      createBadges();
+
+      document.getElementById('main-menu').classList.add('hidden');
+      document.getElementById('planet-selection').classList.remove('hidden');
+      document.getElementById('planet-screen').classList.add('hidden');
+      document.getElementById('final-screen').classList.add('hidden');
+    }
+
+    // تهيئة اللعبة
+    function initGame() {
+      createStars();
+
+      document.getElementById('start-btn').addEventListener('click', () => {
+        playerName = document.getElementById('player-name').value || 'مستكشف مجهول';
+        resetGame();
+      });
+
+      document.getElementById('submit-answers').addEventListener('click', checkAnswers);
+
+      document.getElementById('back-to-selection').addEventListener('click', () => {
+        document.getElementById('planet-screen').classList.add('hidden');
+        document.getElementById('planet-selection').classList.remove('hidden');
+        createPlanetCards();
+        createBadges();
+      });
+
+      document.getElementById('continue-btn').addEventListener('click', () => {
+        document.getElementById('correct-popup').classList.add('hidden');
+        const hasBadge = earnedBadges.some(badge => badge.planetId === currentPlanet.id);
+        if (hasBadge) {
+          showBadgePopup();
+        } else {
+          document.getElementById('planet-screen').classList.add('hidden');
+          document.getElementById('planet-selection').classList.remove('hidden');
+          createPlanetCards();
+          createBadges();
+        }
+      });
+
+      document.getElementById('badge-continue-btn').addEventListener('click', () => {
+        document.getElementById('badge-popup').classList.add('hidden');
+        document.getElementById('planet-screen').classList.add('hidden');
+        document.getElementById('planet-selection').classList.remove('hidden');
+        createPlanetCards();
+        createBadges();
+      });
+
+      document.getElementById('play-again').addEventListener('click', () => {
+        document.getElementById('final-screen').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', initGame);
+  </script>
+</body>
+</html>
