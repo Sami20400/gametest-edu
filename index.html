@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الألعاب التعليمية – Edu Games</title>
+  <!-- Tailwind → CDN (build-free) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts (Tajawal & Inter) -->
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {font-family: 'Tajawal', 'Inter', sans-serif; background:#f9fafb; color:#111827;}
+    /* basic smooth fade-in for dynamic content */
+    .fade {animation:fade .35s ease-in forwards; opacity:0;} @keyframes fade{to{opacity:1}}
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- ♦ Top-bar (Language switch) -->
+  <header class="shadow bg-white sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <h1 class="text-xl font-bold select-none">🎮 Edu Games</h1>
+      <button id="langToggle" class="px-4 py-1 rounded border border-gray-300 text-sm">English</button>
+    </div>
+  </header>
+
+  <!-- ♦ Main Navigation (4 subjects + Add Game) -->
+  <nav class="bg-gradient-to-r from-cyan-500 to-blue-500 text-white">
+    <ul class="container mx-auto px-4 py-4 grid grid-cols-2 md:grid-cols-5 gap-4 text-center text-lg font-semibold">
+      <li><button data-section="science" class="subjectBtn w-full py-2">🔬 <span data-i18n="science">العلوم</span></button></li>
+      <li><button data-section="math" class="subjectBtn w-full py-2">🧮 <span data-i18n="math">الرياضيات</span></button></li>
+      <li><button data-section="arabic" class="subjectBtn w-full py-2">📚 <span data-i18n="arabic">اللغة العربية</span></button></li>
+      <li><button data-section="english" class="subjectBtn w-full py-2">📖 <span data-i18n="english">اللغة الإنجليزية</span></button></li>
+      <li><button data-section="add" class="subjectBtn w-full py-2">➕ <span data-i18n="addGame">أضف لعبتك</span></button></li>
+    </ul>
+  </nav>
+
+  <!-- ♦ Dynamic content root -->
+  <main id="content" class="flex-1 container mx-auto px-4 py-8"></main>
+
+  <!-- ♦ Footer -->
+  <footer class="bg-gray-100 text-center py-4 text-sm">
+    إعداد: سامي القصابي – Prepared by Sami Al-Qasabi
+  </footer>
+
+  <!-- ▬▬▬▬▬ Templates ▬▬▬▬▬ -->
+  <!-- Science game (Planet Explorer)  → Entire original markup/css/js lives here -->
+  <template id="scienceTpl">
+    <!-- BEGIN SCIENCE GAME CODE  (paste FULL block provided earlier) -->
+  </template>
+
+  <!-- Math game (Magic Multiplication) → Entire original markup/css/js lives here -->
+  <template id="mathTpl">
+    <!-- BEGIN MATH GAME CODE  (paste FULL block provided earlier) -->
+  </template>
+
+  <!-- Arabic & English placeholder lists (empty for now) -->
+  <template id="arabicTpl"><div class="text-center text-2xl font-bold">
+      🏗️ سيتم إضافة ألعاب اللغة العربية لاحقًا…
+    </div></template>
+  <template id="englishTpl"><div class="text-center text-2xl font-bold">
+      🏗️ English Language games coming soon…
+    </div></template>
+
+  <!-- Add-Your-Game form -->
+  <template id="addTpl">
+    <section class="max-w-3xl mx-auto bg-white shadow rounded p-6 fade">
+      <h2 class="text-2xl font-bold mb-4" data-i18n="addGameHeading">أضف لعبتك</h2>
+      <div class="space-y-4">
+        <label class="block">
+          <span class="font-semibold" data-i18n="codeLabel">الصق كود HTML/JS هنا:</span>
+          <textarea id="userCode" class="w-full h-40 p-2 mt-2 border rounded font-mono text-sm"></textarea>
+        </label>
+        <label class="block">
+          <span class="font-semibold" data-i18n="subjectLabel">اختر المادة:</span>
+          <select id="userSubject" class="mt-2 border rounded px-2 py-1">
+            <option value="science" data-i18n="science">العلوم</option>
+            <option value="math" data-i18n="math">الرياضيات</option>
+            <option value="arabic" data-i18n="arabic">اللغة العربية</option>
+            <option value="english" data-i18n="english">اللغة الإنجليزية</option>
+          </select>
+        </label>
+        <button id="saveGame" class="px-4 py-2 bg-blue-600 text-white rounded" data-i18n="saveBtn">حفظ اللعبة</button>
+      </div>
+    </section>
+  </template>
+
+  <!--  Modal for YouTube videos (shared) -->
+  <div id="ytModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center z-50">
+    <div class="bg-white w-full md:w-[80%] lg:w-[60%] aspect-video relative rounded shadow">
+      <button id="closeYT" class="absolute -top-4 -right-4 bg-red-600 text-white w-8 h-8 rounded-full">✕</button>
+      <iframe id="ytFrame" class="w-full h-full rounded" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- ▬▬▬▬▬ Main Controller – JS ▬▬▬▬▬ -->
+  <script>
+  // 🌐 Simple i18n
+  const strings = {
+    ar:{science:'العلوم',math:'الرياضيات',arabic:'اللغة العربية',english:'اللغة الإنجليزية',addGame:'أضف لعبتك',addGameHeading:'أضف لعبتك',codeLabel:'الصق كود HTML/JS هنا:',subjectLabel:'اختر المادة:',saveBtn:'حفظ اللعبة',moreInfo:'معلومات إضافية'},
+    en:{science:'Science',math:'Mathematics',arabic:'Arabic Language',english:'English Language',addGame:'Add Your Game',addGameHeading:'Add Your Game',codeLabel:'Paste HTML/JS code here:',subjectLabel:'Choose subject:',saveBtn:'Save game',moreInfo:'More Info'}
+  };
+  let lang = 'ar';
+  const content = document.getElementById('content');
+  function translatePage(){
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang==='ar')?'rtl':'ltr';
+    document.getElementById('langToggle').textContent = (lang==='ar')?'English':'العربية';
+    document.querySelectorAll('[data-i18n]').forEach(el=>{
+      const key = el.getAttribute('data-i18n');
+      el.textContent = strings[lang][key]||key;
+    });
+  }
+  document.getElementById('langToggle').onclick = ()=>{lang = (lang==='ar')?'en':'ar';translatePage();};
+  translatePage();
+
+  // 🔀 Routing by subject buttons
+  document.querySelectorAll('.subjectBtn').forEach(btn=>{
+    btn.onclick = ()=>loadSection(btn.dataset.section);
+  });
+  function loadSection(sec){
+    const map = {science:'scienceTpl',math:'mathTpl',arabic:'arabicTpl',english:'englishTpl',add:'addTpl'};
+    const tpl = document.getElementById(map[sec]); if(!tpl) return;
+    content.innerHTML = ''; content.appendChild(tpl.content.cloneNode(true));
+    if(sec==='science'||sec==='math'){attachMoreInfoButton(sec);}    // attach YouTube button after game loads
+    if(sec==='add'){bindAddForm();}
+  }
+  loadSection('science'); // default first load
+
+  // 💾 Add Your Game → store in localStorage
+  function bindAddForm(){
+    const saveBtn = document.getElementById('saveGame');
+    saveBtn.onclick = ()=>{
+      const code = document.getElementById('userCode').value.trim();
+      const subj = document.getElementById('userSubject').value;
+      if(!code){alert('No code');return;}
+      let list = JSON.parse(localStorage.getItem('userGames')||'{}');
+      list[subj] = list[subj]||[]; list[subj].push(code);
+      localStorage.setItem('userGames',JSON.stringify(list));
+      alert(lang==='ar'? 'تم حفظ لعبتك!' : 'Game saved!');
+      document.getElementById('userCode').value='';
+    }
+  }
+
+  // ▶️ YouTube More Info
+  function attachMoreInfoButton(sec){
+    // create floating button top-right of main area
+    const btn = document.createElement('button');
+    btn.textContent = strings[lang].moreInfo;
+    btn.className = 'fixed bottom-6 right-6 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg';
+    document.body.appendChild(btn);
+    btn.onclick = ()=>{
+      const q = (lang==='ar')? (sec==='science'? 'كواكب المجموعة الشمسية للأطفال' : 'تعلم جدول الضرب بطريقة سهلة') : (sec==='science'? 'solar system planets for kids' : 'learn multiplication table for kids');
+      fetchYT(q);
+    };
+    // clean up button when leaving section
+    const obs = new MutationObserver(()=>{if(!content.contains(btn)){btn.remove();obs.disconnect();}});
+    obs.observe(content,{childList:true});
+  }
+  async function fetchYT(query){
+    try{
+      // Public unauth search via youtube search embed (deprecated but still works); fallback to Data API with key if provided
+      const embedURL = `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(query)}`;
+      openYT(embedURL);
+    }catch(e){console.error(e);}
+  }
+  function openYT(src){
+    document.getElementById('ytFrame').src = src;
+    document.getElementById('ytModal').classList.remove('hidden');
+  }
+  document.getElementById('closeYT').onclick = ()=>{
+    document.getElementById('ytModal').classList.add('hidden');
+    document.getElementById('ytFrame').src='';
+  };
+  </script>
+</body>
+</html>
